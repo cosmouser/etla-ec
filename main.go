@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+	http.HandleFunc("/", actions.IndexHandler)
 	http.HandleFunc("/getInfo", actions.APIHandler)
 	http.ListenAndServe(config.Details.Port, nil)
 }
