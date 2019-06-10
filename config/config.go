@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"log"
+	"strconv"
 
 	"github.com/BurntSushi/toml"
 )
@@ -11,6 +12,7 @@ import (
 type Config struct {
 	Server     map[string]string
 	Enterprise map[string]string
+	Port       string
 }
 
 // Server map
@@ -33,6 +35,7 @@ var Details Config
 func init() {
 	var err error
 	configPath := flag.String("config", "./config/test_config.toml", "use -config to specify the config file to load")
+	listenPort := flag.Int("port", 8080, "port to listen on")
 	flag.Parse()
 	if *configPath == "" {
 		log.Fatal("please use -config to specify a config file")
@@ -41,4 +44,5 @@ func init() {
 	if err != nil {
 		log.Fatal("could not load config at:", *configPath)
 	}
+	Details.Port = ":" + strconv.Itoa(*listenPort)
 }
