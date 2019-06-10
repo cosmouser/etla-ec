@@ -50,15 +50,15 @@ func APIHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		log.WithFields(log.Fields{
-			"remoteAddr": ra,
-			"uid":        query.Get("uid"),
-		}).Info("response delivered")
 		slurp, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Fatal("unable to read response from adobe", err)
 		}
 		w.Write(slurp)
+		log.WithFields(log.Fields{
+			"remoteAddr": ra,
+			"uid":        query.Get("uid"),
+		}).Info("response delivered")
 	}
 	return
 }
