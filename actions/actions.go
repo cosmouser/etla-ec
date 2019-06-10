@@ -16,11 +16,12 @@ import (
 var umToken *accessResponse
 
 func init() {
-	umToken = &accessResponse{}
+	checkToken()
 }
 
 // APIHandler is handles all external calls to the API
 func APIHandler(w http.ResponseWriter, r *http.Request) {
+	checkToken()
 	ra := r.Header.Get("X-Real-IP")
 	if ra == "" {
 		ra = r.RemoteAddr
@@ -89,14 +90,6 @@ func getUserInfo(userString string, token *accessResponse) (*http.Response, erro
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
-	}
-	// renews the token if its expired and resends the getUserInfo request
-	if resp.StatusCode == 401 {
-		umToken.renew()
-		resp, err = httpClient.Do(req)
-		if err != nil {
-			return nil, err
-		}
 	}
 	return resp, nil
 }

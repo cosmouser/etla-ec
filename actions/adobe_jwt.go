@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -26,6 +27,19 @@ type accessResponse struct {
 	ExpiresOn   string
 }
 
+func checkToken() {
+	var err error
+	if umToken == nil {
+		umToken = &accessResponse{ExpiresOn: "0"}
+	}
+	expDate, err := strconv.Atoi(umToken.ExpiresOn)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if time.Unix(int64(expDate), 0).Before(time.Now()) {
+		umToken.renew()
+	}
+}
 func generateJWT() string {
 	signBytes, err := ioutil.ReadFile(config.Details.Enterprise["PrivKeyPath"])
 	if err != nil {
@@ -110,9 +124,11 @@ func (token *accessResponse) renew() {
 	token.TokenType = newToken.TokenType
 	token.AccessToken = newToken.AccessToken
 	token.ExpiresIn = newToken.ExpiresIn
+	token.ExpiresOn = strconv.Itoa(int(time.Now().Add(time.Millisecond * time.Duration(token.ExpiresIn)).Unix()))
 	log.WithFields(log.Fields{
 		"TokenType":   token.TokenType,
 		"AccessToken": token.AccessToken,
 		"ExpiresIn":   token.ExpiresIn,
+		"ExpiresOn":   token.ExpiresOn,
 	}).Info("token renewed")
 }
