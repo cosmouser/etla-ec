@@ -6,6 +6,7 @@ import (
 
 	"github.com/cosmouser/etla-ec/actions"
 	"github.com/cosmouser/etla-ec/config"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -21,5 +22,6 @@ func main() {
 	http.HandleFunc("/login", actions.RedirectToIDP)
 	http.HandleFunc("/metadata", actions.ExposeMetadata)
 	http.HandleFunc(config.Details.AssertionConsumerServiceURL, actions.SAMLCallback)
+	http.Handle("/metrics", promhttp.Handler())
 	http.ListenAndServe(config.Details.Port, nil)
 }
