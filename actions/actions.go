@@ -2,6 +2,7 @@ package actions
 
 import (
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -93,3 +94,60 @@ func getUserInfo(userString string, token *accessResponse) (*http.Response, erro
 	}
 	return resp, nil
 }
+
+// IndexHandler serves the home page with the form for submitting internal requests to etla-ec
+func IndexHandler(w http.ResponseWriter, r *http.Request) {
+	var data = struct {
+		ExternalURL string
+	}{
+		ExternalURL: config.Details.ExternalURL,
+	}
+	if err := indexTemplate.Execute(w, &data); err != nil {
+		log.Error(err)
+	}
+	return
+}
+
+var indexTemplate = template.Must(template.New("1").Parse(`<!DOCTYPE html>
+<html>
+  <head>
+	<title>ETLA Entitlement Checker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> 
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>  </head>
+  <body class="container-fluid">
+	<div class="row">
+	  <div class="col-sm-4 col-sm-offset-4">
+		<h1>AzureAD Entitlement Checker</h1>
+		<form id="checker">
+		  <div class="form-group"><label for="uid">Email of user:</label>
+		  <input type="text" class="form-control" id="uid" name="uid" value="cosmo@ucsc.edu"></div>
+		  <button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+		<br>
+		<div class="well" id="results">Results will show here</div>
+		<script>
+		  $("#checker").submit(function(e) {
+			var form = $(this);
+		    $.ajax({
+			  type: "GET",
+			  url: '{{.ExternalURL}}/getInfo?' + form.serialize(),
+			  success: function(data) {
+				  var out = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+				$("#results").html(out);
+			  },
+			  error: function(jqxhr) {
+				$("#results").text(jqxhr.responseText);
+			  },
+			  beforeSend: function(xhr, settings) {
+				xhr.setRequestHeader('Accept', 'application/json');
+			  }
+			});
+			e.preventDefault();
+		  });
+	  </script>
+	  </div>
+	</div>
+  </body>
+</html>
+`))

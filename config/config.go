@@ -10,9 +10,10 @@ import (
 
 // Config data provides etla-ec with credentials for talking with Adobe's UMAPI
 type Config struct {
-	Server     map[string]string
-	Enterprise map[string]string
-	Port       string
+	Server      map[string]string
+	Enterprise  map[string]string
+	ExternalURL string
+	Port        string
 }
 
 // Server map
