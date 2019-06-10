@@ -14,6 +14,14 @@ type Config struct {
 	Enterprise  map[string]string
 	ExternalURL string
 	Port        string
+
+	// SAML SECTION
+	PrivateKeyPath              string
+	PublicCertPath              string
+	ServiceProviderIssuer       string
+	AssertionConsumerServiceURL string // /_saml_callback
+	AudienceURI                 string
+	IDPMetadataURL              string
 }
 
 // Server map
