@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/cosmouser/etla-ec/config"
 	jwt "github.com/dgrijalva/jwt-go"
@@ -108,4 +109,9 @@ func (token *accessResponse) renew() {
 	token.TokenType = newToken.TokenType
 	token.AccessToken = newToken.AccessToken
 	token.ExpiresIn = newToken.ExpiresIn
+	log.WithFields(log.Fields{
+		"TokenType":   token.TokenType,
+		"AccessToken": token.AccessToken,
+		"ExpiresIn":   token.ExpiresIn,
+	}).Info("token renewed")
 }
