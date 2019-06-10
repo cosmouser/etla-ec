@@ -103,7 +103,7 @@ func AuthMiddleware(handler http.Handler) http.Handler {
 		if ra == "" {
 			ra = r.RemoteAddr
 		}
-		session, err := store.Get(r, "jackstat_session")
+		session, err := store.Get(r, "etla-ec_session")
 		if err != nil {
 			http.Redirect(w, r, config.Details.ExternalURL+"/login", 302)
 			log.WithFields(log.Fields{
