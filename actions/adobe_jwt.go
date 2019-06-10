@@ -97,8 +97,8 @@ func requestAccess(body string) (*accessResponse, error) {
 	return &accResp, nil
 }
 
-// Renew renews the token
-func (token *accessResponse) Renew() {
+// renew renews the token
+func (token *accessResponse) renew() {
 	var err error
 	generatedJWT := generateJWT()
 	newToken, err := requestAccess(generatedJWT)

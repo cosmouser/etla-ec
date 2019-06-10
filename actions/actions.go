@@ -8,11 +8,11 @@ import (
 	"github.com/cosmouser/etla-ec/config"
 )
 
-// token is the current JWT for authenticating requests
-var token *accessResponse
+// umtoken is the current JWT for authenticating requests
+var umToken *accessResponse
 
 func init() {
-	token = &accessResponse{}
+	umToken = &accessResponse{}
 }
 
 func getUserInfo(userString string, token *accessResponse) (*http.Response, error) {
@@ -37,10 +37,18 @@ func getUserInfo(userString string, token *accessResponse) (*http.Response, erro
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("x-api-key", config.Details.Enterprise["APIKey"])
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token.AccessToken))
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", umToken.AccessToken))
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
+	}
+	// renews the token if its expired and resends the getUserInfo request
+	if resp.StatusCode == 401 {
+		umToken.renew()
+		resp, err = httpClient.Do(req)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return resp, nil
 }
