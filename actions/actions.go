@@ -117,8 +117,8 @@ var indexTemplate = template.Must(template.New("1").Parse(`<!DOCTYPE html>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>  </head>
   <body class="container-fluid">
 	<div class="row">
-	  <div class="col-sm-4 col-sm-offset-4">
-		<h1>AzureAD Entitlement Checker</h1>
+	  <div class="col-lg-12">
+		<h1>ETLA Entitlement Checker</h1>
 		<form id="checker">
 		  <div class="form-group"><label for="uid">Email of user:</label>
 		  <input type="text" class="form-control" id="uid" name="uid" value="cosmo@ucsc.edu"></div>
