@@ -10,5 +10,7 @@ import (
 func main() {
 	http.HandleFunc("/", actions.IndexHandler)
 	http.HandleFunc("/getInfo", actions.APIHandler)
+	http.HandleFunc("/login", actions.RedirectToIDP)
+	http.HandleFunc("/metadata", actions.ExposeMetadata)
 	http.ListenAndServe(config.Details.Port, nil)
 }
