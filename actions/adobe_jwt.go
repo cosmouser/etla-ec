@@ -23,6 +23,7 @@ type accessResponse struct {
 	TokenType   string `json:"token_type"`
 	AccessToken string `json:"access_token"`
 	ExpiresIn   int    `json:"expires_in"`
+	ExpiresOn   string
 }
 
 func generateJWT() string {
