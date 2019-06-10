@@ -2,10 +2,14 @@ package actions
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 
+	"github.com/badoux/checkmail"
 	"github.com/cosmouser/etla-ec/config"
+	log "github.com/sirupsen/logrus"
 )
 
 // umtoken is the current JWT for authenticating requests
@@ -13,6 +17,50 @@ var umToken *accessResponse
 
 func init() {
 	umToken = &accessResponse{}
+}
+
+// APIHandler is handles all external calls to the API
+func APIHandler(w http.ResponseWriter, r *http.Request) {
+	ra := r.Header.Get("X-Real-IP")
+	if ra == "" {
+		ra = r.RemoteAddr
+	}
+	rURI, err := url.ParseRequestURI(r.RequestURI)
+	if err != nil {
+		log.Fatal(err)
+	}
+	query := rURI.Query()
+	switch r.Method {
+	case "GET":
+		if err := checkmail.ValidateFormat(query.Get("uid")); err != nil {
+			log.WithFields(log.Fields{
+				"remoteAddr": ra,
+				"uid":        query.Get("uid"),
+			}).Error(err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		resp, err := getUserInfo(query.Get("uid"), umToken)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"remoteAddr": ra,
+				"uid":        query.Get("uid"),
+			}).Error(err.Error())
+			http.Error(w, "request to adobe was not successful", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		log.WithFields(log.Fields{
+			"remoteAddr": ra,
+			"uid":        query.Get("uid"),
+		}).Info("response delivered")
+		slurp, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal("unable to read response from adobe", err)
+		}
+		w.Write(slurp)
+	}
+	return
 }
 
 func getUserInfo(userString string, token *accessResponse) (*http.Response, error) {
