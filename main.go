@@ -17,13 +17,14 @@ func main() {
 			time.Sleep(time.Hour * 24)
 		}
 	}()
-	// http.HandleFunc("/", actions.IndexHandler)
-	// http.HandleFunc("/getInfo", actions.APIHandler)
-	indexer := http.HandlerFunc(actions.IndexHandler)
-	getInfoer := http.HandlerFunc(actions.APIHandler)
+	http.HandleFunc("/", actions.IndexHandler)
+	http.HandleFunc("/getInfo", actions.APIHandler)
 
-	http.Handle("/", actions.AuthMiddleware(indexer))
-	http.Handle("/getInfo", actions.AuthMiddleware(getInfoer))
+	indexer := http.HandlerFunc(actions.IndexHandler)
+	// getInfoer := http.HandlerFunc(actions.APIHandler)
+
+	http.Handle("/shibtest", actions.AuthMiddleware(indexer))
+	// http.Handle("/getInfo", actions.AuthMiddleware(getInfoer))
 	http.HandleFunc("/login", actions.RedirectToIDP)
 	http.HandleFunc("/metadata", actions.ExposeMetadata)
 	http.HandleFunc(config.Details.AssertionConsumerServiceURL, actions.SAMLCallback)
