@@ -133,7 +133,20 @@ var indexTemplate = template.Must(template.New("1").Parse(`<!DOCTYPE html>
 			  type: "GET",
 			  url: '{{.ExternalURL}}/getInfo?' + form.serialize(),
 			  success: function(data) {
-				  var out = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+				  var out = "";
+					if(data.result == "success") {
+							if(data.user.groups.length == 0) {
+									out = "User has no assigned products<br>User type: " + data.user.type;
+							} else {
+									out = "Assigned products:<br>";
+									for(i = 0; i < data.user.groups.length; i++) {
+											out += data.user.groups[i] + "<br>";
+									}
+									out += "User type: " + data.user.type;
+							}
+					} else {
+							out = data.message;
+					}
 				$("#results").html(out);
 			  },
 			  error: function(jqxhr) {
