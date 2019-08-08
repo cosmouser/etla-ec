@@ -135,14 +135,14 @@ var indexTemplate = template.Must(template.New("1").Parse(`<!DOCTYPE html>
 			  success: function(data) {
 				  var out = "";
 					if(data.result == "success") {
-							if(data.user.groups.length == 0) {
-									out = "User has no assigned products<br>User type: " + data.user.type;
+							if(data.user.groups) {
+								out = "Assigned products:<br>";
+								for(i = 0; i < data.user.groups.length; i++) {
+										out += "- " + data.user.groups[i] + "<br>";
+								}
+								out += "User type: " + data.user.type;
 							} else {
-									out = "Assigned products:<br>";
-									for(i = 0; i < data.user.groups.length; i++) {
-											out += data.user.groups[i] + "<br>";
-									}
-									out += "User type: " + data.user.type;
+								out = "User has no assigned products<br>User type: " + data.user.type;
 							}
 					} else {
 							out = data.message;
